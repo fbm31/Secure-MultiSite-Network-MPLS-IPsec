@@ -1,0 +1,125 @@
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname PE1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no aaa new-model
+memory-size iomem 5
+no ip icmp rate-limit unreachable
+ip cef
+!
+
+!
+ip vrf ClientA
+ rd 1234:101
+ route-target export 1234:101
+ route-target import 1234:101
+!
+ip vrf ClientB
+ rd 1234:202
+ route-target export 1234:202
+ route-target import 1234:202
+!
+no ip domain lookup
+!
+multilink bundle-name authenticated
+!
+!
+archive
+ log config
+  hidekeys
+!
+!
+ip tcp synwait-time 5
+!
+!
+interface Loopback0
+ ip address 11.11.11.11 255.255.255.255
+!
+interface FastEthernet0/0
+ description Vers_P1
+ ip address 10.0.1.2 255.255.255.252
+ speed 100
+ full-duplex
+ mpls ip
+!
+interface FastEthernet0/1
+ description Vers_P2
+ ip address 10.0.1.6 255.255.255.252
+ speed 100
+ full-duplex
+ mpls ip
+!
+interface FastEthernet1/0
+ description Vers_CE1A
+ ip vrf forwarding ClientA
+ ip address 192.168.101.1 255.255.255.252
+ speed 100
+ full-duplex
+!
+interface FastEthernet2/0
+ description Vers_CE1B
+ ip vrf forwarding ClientB
+ ip address 192.168.202.1 255.255.255.252
+ speed 100
+ full-duplex
+!
+router ospf 1
+ log-adjacency-changes
+ network 0.0.0.0 255.255.255.255 area 0
+!
+router bgp 1234
+ no bgp default ipv4-unicast
+ bgp log-neighbor-changes
+ neighbor 22.22.22.22 remote-as 1234
+ neighbor 22.22.22.22 update-source Loopback0
+ !
+ address-family vpnv4
+  neighbor 22.22.22.22 activate
+  neighbor 22.22.22.22 send-community extended
+ exit-address-family
+ !
+ address-family ipv4 vrf ClientB
+  neighbor 192.168.202.2 remote-as 65001
+  neighbor 192.168.202.2 activate
+  no synchronization
+ exit-address-family
+ !
+ address-family ipv4 vrf ClientA
+  neighbor 192.168.101.2 remote-as 65001
+  neighbor 192.168.101.2 activate
+  no synchronization
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+no cdp log mismatch duplex
+!
+!
+control-plane
+!
+!
+
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line vty 0 4
+ login
+!
+!
+end
