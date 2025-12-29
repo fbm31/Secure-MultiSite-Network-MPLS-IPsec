@@ -1,0 +1,92 @@
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+no service dhcp
+!
+hostname S2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no aaa new-model
+memory-size iomem 5
+no ip routing
+no ip icmp rate-limit unreachable
+no ip cef
+!
+!
+no ip domain lookup
+!
+multilink bundle-name authenticated
+!
+!
+macro name add_vlan
+end
+vlan database
+vlan $v
+exit
+@
+macro name del_vlan
+end
+vlan database
+no vlan $v
+exit
+@
+!
+vtp file nvram:vlan.dat
+archive
+ log config
+  hidekeys
+!
+!
+ip tcp synwait-time 5
+!
+!
+interface FastEthernet0/0
+ description *** Unused for Layer2 EtherSwitch ***
+ no ip address
+ no ip route-cache
+ shutdown
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ description *** Unused for Layer2 EtherSwitch ***
+ no ip address
+ no ip route-cache
+ shutdown
+ duplex auto
+ speed auto
+!
+interface FastEthernet1/0
+ switchport access vlan 20
+ duplex full
+ speed 100
+!
+interface FastEthernet1/1
+ switchport access vlan 10
+ duplex full
+ speed 100
+!
+interface FastEthernet1/15
+ switchport mode trunk
+ duplex full
+ speed 100
+!
+interface Vlan1
+ no ip address
+ no ip route-cache
+ shutdown
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+no cdp log mismatch duplex
+!
+control-plane
+!
+end
