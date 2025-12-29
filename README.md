@@ -13,7 +13,7 @@ Ce projet simule une infrastructure réseau FAI sécurisé. L'objectif est de fo
     * MPLS (LDP) pour la commutation de labels.
     * MP-BGP pour l'échange de routes clients.
 * **Isolation (Segmentation) :**
-    * VRF Lite (Virtual Routing and Forwarding) pour séparer les tables de routage Client A / Client B.
+    * VRF (Virtual Routing and Forwarding) pour séparer les tables de routage Client A / Client B.
 * **Sécurité (Edge) :**
     * Tunneling IPsec (Site-to-Site) avec chiffrement AES et authentification SHA-HMAC.
     * ACLs (Access Control Lists) pour filtrer le trafic non autorisé.
@@ -25,9 +25,9 @@ Ce projet simule une infrastructure réseau FAI sécurisé. L'objectif est de fo
 
 ## Architecture
 L'architecture est divisée en trois zones autonomes (AS) :
-1.  **AS 1234 (Opérateur) :** Cœur de réseau MPLS composé de routeurs P (Provider) et PE (Provider Edge).
-2.  **AS 65001 (Site Client 1) :** Réseau local avec routeurs CE (Customer Edge).
-3.  **AS 65002 (Site Client 2) :** Site distant interconnecté.
+1.  **AS 1234 (Opérateur) :** Cœur de réseau composé de routeurs P (Provider) et PE (Provider Edge).
+2.  **AS 65001 (Site Client 1A, 1B) :** Site 1 du Cient A et du Client B.
+3.  **AS 65002 (Site Client 2A, 2B) :** Site 2 du Cient A et du Client B.
 
 ## Installation / Simulation
 Ce projet a été réalisé sous GNS3 avec des routeurs Cisco c3725.
