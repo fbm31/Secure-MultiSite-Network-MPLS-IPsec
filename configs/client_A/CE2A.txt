@@ -1,0 +1,163 @@
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname CE2A
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no aaa new-model
+memory-size iomem 5
+no ip icmp rate-limit unreachable
+ip cef
+!
+!
+no ip dhcp use vrf connected
+ip dhcp excluded-address 192.168.30.254
+ip dhcp excluded-address 192.168.40.254
+!
+ip dhcp pool VLAN30
+   network 192.168.30.0 255.255.255.0
+   default-router 192.168.30.254
+!
+ip dhcp pool VLAN40
+   network 192.168.40.0 255.255.255.0
+   default-router 192.168.40.254
+!
+!
+no ip domain lookup
+ipv6 unicast-routing
+!
+multilink bundle-name authenticated
+!
+!
+archive
+ log config
+  hidekeys
+!
+!
+crypto isakmp policy 10
+ encr aes
+ authentication pre-share
+ group 5
+crypto isakmp key vpnuser address 1.1.1.1
+!
+!
+crypto ipsec transform-set myset esp-aes esp-sha-hmac
+!
+crypto map mymap local-address Loopback1
+crypto map mymap 10 ipsec-isakmp
+ set peer 1.1.1.1
+ set transform-set myset
+ match address 100
+!
+ip tcp synwait-time 5
+!
+class-map match-any VOIP
+ match access-group 102
+!
+!
+policy-map QOS-POLICY
+ class VOIP
+  priority percent 20
+ class class-default
+  bandwidth percent 80
+!
+!
+interface Loopback0
+ ip address 101.101.101.111 255.255.255.255
+!
+interface Loopback1
+ ip address 21.21.21.21 255.255.255.255
+ ipv6 enable
+!
+interface FastEthernet0/0
+ description Vers_PE2
+ ip address 192.168.101.6 255.255.255.252
+ speed 100
+ full-duplex
+ crypto map mymap
+!
+interface FastEthernet0/1
+ no ip address
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1.30
+ encapsulation dot1Q 30
+ ip address 192.168.30.254 255.255.255.0
+ ip access-group SECURE_ONLY in
+ ipv6 address 2001:DB8:30::1/64
+!
+interface FastEthernet0/1.40
+ encapsulation dot1Q 40
+ ip address 192.168.40.254 255.255.255.0
+ ip access-group SECURE_ONLY in
+ ipv6 address 2001:DB8:40::1/64
+!
+interface FastEthernet1/0
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface FastEthernet2/0
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+router bgp 65002
+ no synchronization
+ bgp log-neighbor-changes
+ network 21.21.21.21 mask 255.255.255.255
+ network 101.101.101.111 mask 255.255.255.255
+ network 192.168.30.0
+ network 192.168.40.0
+ neighbor 192.168.101.5 remote-as 1234
+ no auto-summary
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+ip access-list extended SECURE_ONLY
+ permit udp any any eq bootps
+ permit udp any any eq bootpc
+ permit tcp any any eq 443
+ permit tcp any any eq 22
+ permit icmp any any echo
+ permit icmp any any echo-reply
+ deny   ip any any
+!
+access-list 100 permit ip 192.168.30.0 0.0.0.255 192.168.10.0 0.0.0.255
+access-list 100 permit ip 192.168.40.0 0.0.0.255 192.168.10.0 0.0.0.255
+access-list 100 permit ip 192.168.30.0 0.0.0.255 192.168.20.0 0.0.0.255
+access-list 100 permit ip 192.168.40.0 0.0.0.255 192.168.20.0 0.0.0.255
+access-list 102 permit udp any any range 16384 32767
+access-list 102 permit tcp any any eq 5060
+no cdp log mismatch duplex
+!
+!
+control-plane
+!
+
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ escape-character 3
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line vty 0 4
+ login
+!
+!
+end
