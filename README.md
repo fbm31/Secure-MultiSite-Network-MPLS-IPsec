@@ -1,10 +1,10 @@
 Conception d'un Réseau Multi-Sites Sécurisé (MPLS, BGP, IPsec)
 
-![Network Topology](docs/topology_diagram.png)
-
 
 ## Description
 Ce projet simule une infrastructure réseau FAI sécurisé. L'objectif est de fournir une connectivité sécurisée et isolée à deux clients distincts (A et B), possédant chacun plusieurs sites géographiques.
+
+![Network Topology](docs/topology_diagram.png)
 
 
 ## Technologies & Protocoles
