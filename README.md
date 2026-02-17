@@ -45,5 +45,9 @@ Pour garantir la confidentialité des échanges entre les sites clients traversa
 Des ACLs ont été appliquées sur les interfaces Edge pour bloquer tout trafic non chiffré ou non légitime (Telnet bloqué, SSH autorisé).
 
 
+## Note sur l'environnement
+Ce projet étant une simulation académique sous GNS3, certaines mesures de durcissement (Hardening) comme les mots de passe enable secret, service password-encryption ou la configuration AAA n'ont pas été activées pour faciliter le débogage et la démonstration.
+En environnement de production, ces mesures seraient évidemment la première étape de configuration.
+
 ## Auteurs
  Fabien MOINE
